@@ -1,0 +1,64 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.cabecera{
+    width: 80%;
+    margin: 0px auto;
+    text-align: center;
+    align-self: center;
+}
+
+#nombre-tienda{
+    height: 50px;
+}
+
+#agregar-manga{
+    margin-left: 50%;
+    transform: translateX(-50%);
+}
+
+#pag-principal{
+    width: 80%;
+    margin: 0px auto;
+    margin-top: 15px;
+}
+
+.carrito-compras{
+    width: 20%;
+    float: left;
+    padding: 5px;
+    border-radius: 10px;
+    border-style: groove;
+}
+
+.contenedor-mangas{
+    width: 80%;
+    float: left;
+}
+
+.mostrar-productos{
+    float: left;
+    margin: 5px;
+    padding: 5px;
+    width: 200px;
+    height: 150px;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.6);
+}
+
+.lista{
+    padding: 0%;
+}
+
+#formulario-carga{
+    width: 250px;
+	height: 150px;
+    margin: auto;
+    padding: 5px;
+	box-shadow: 1px 7px 25px rgba(0,0,0,0.6);
+    font-style: italic;
+}
+
