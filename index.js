@@ -14,11 +14,11 @@ class Manga {
 }
 
 const manga = [
-    new Manga(1, "ivrea", "b6 doble", "Shaman king", "Hiroyuki Takei", 30, 1700),
-    new Manga(2, "ivrea", "tanko", "Chainsaw man", "Tatsuki Fujimoto", 15, 750),
-    new Manga(3, "panini", "tanko", "Berserk", "Kentaro Miura", 10, 1100),
-    new Manga(4, "ivrea", "b6", "Mushihime", "Masaya Hokazono", 15, 850),
-    new Manga(5, "ivrea", "b6", "Alice in Borderland", "Haro Aso", 14, 1700)
+    new Manga(1, "Ivrea", "b6 doble", "Shaman king", "Hiroyuki Takei", 30, 1700),
+    new Manga(2, "Ivrea", "tanko", "Chainsaw man", "Tatsuki Fujimoto", 15, 750),
+    new Manga(3, "Panini", "tanko", "Berserk", "Kentaro Miura", 10, 1100),
+    new Manga(4, "Ivrea", "b6", "Mushihime", "Masaya Hokazono", 15, 850),
+    new Manga(5, "Ivrea", "b6", "Alice in Borderland", "Haro Aso", 14, 1700)
 ];
 
 class Precios {
@@ -30,15 +30,15 @@ class Precios {
 };
 
 const preciosMarca = [
-    new Precios("ivrea", "tanko", 750),
-    new Precios("ivrea", "b6", 850),
-    new Precios("ivrea", "b6 doble", 1700),
-    new Precios("ivrea", "a5", 2000),
-    new Precios("panini", "tanko", 1100),
-    new Precios("panini", "b6 doble", 1700),
-    new Precios("panini", "a5", 1900),
-    new Precios("ovni press", "b6", 990),
-    new Precios("ovni press", "b6 doble", 1750)
+    new Precios("Ivrea", "tanko", 750),
+    new Precios("Ivrea", "b6", 850),
+    new Precios("Ivrea", "b6 doble", 1700),
+    new Precios("Ivrea", "a5", 2000),
+    new Precios("Panini", "tanko", 1100),
+    new Precios("Panini", "b6 doble", 1700),
+    new Precios("Panini", "a5", 1900),
+    new Precios("Ovni press", "b6", 990),
+    new Precios("Ovni press", "b6 doble", 1750)
 ];
 
 let carrito = [];
@@ -127,9 +127,9 @@ let nuevoManga = () =>{
     <form id="formulario-carga"><!--marca, formato, titulo, autor, stock, precio-->
         <label for="marca">Marca: </label>
         <select id="marca" name="marca" required>
-            <option>ivrea</option>
-            <option>panini</option>
-            <option>ovni press</option>
+            <option>Ivrea</option>
+            <option>Panini</option>
+            <option>Ovni press</option>
         </select><br>
         <label for="formato">Formato: </label>
         <select id="formato" name="formato" required>
