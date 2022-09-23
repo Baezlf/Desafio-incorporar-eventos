@@ -8,9 +8,11 @@ class Manga {
         this.stock = stock;
         this.precio = precio;
     }
-    venta(cantidad){
-        this.stock -= cantidad;
+    Venta(cantidad){
+        if(this.stock > 0){this.stock -= cantidad;}
+        else{alert(`Sin stock. Disculpe la molestia.`)}
     }
+    
 }
 
 const manga = [
@@ -47,10 +49,18 @@ const contenedor = document.getElementById("contenedor");
 const carritoComprasHTML = document.getElementById("carrito");
 const totalCompra = document.getElementById("total");
 const vaciar = document.getElementById("boton-vaciar");
+const comprar = document.getElementById("realizar-compra")
 const agregarNuevoManga = document.getElementById("agregar-manga");
 const formulario = document.getElementById("formulario");
+const mangasVendidos = document.getElementById("mangas-vendidos");
+const listaVentas = document.getElementById("ver-ventas");
 
-manga.forEach(producto => {
+//localStorage.setItem("mangasGuardados", JSON.stringify(manga))//comentar despues de cargar un producto nuevo para que no se sobreescriba
+
+
+//mostrar productos en la pagina
+let mangasGuardados = JSON.parse(localStorage.getItem("mangasGuardados"));
+mangasGuardados.forEach(producto => {
     const div = document.createElement(`div`);
     if (producto.stock > 0){
         let divHTML = `
@@ -64,22 +74,42 @@ manga.forEach(producto => {
         </div>
         `;
         div.innerHTML +=divHTML;
+    }else{
+        let divHTML = `
+        <div class="mostrar-productos">
+            <h3 class="titulo-manga">"${producto.titulo}"</h3>
+            <p>Autor: ${producto.autor}<br>
+            Editorial: ${producto.marca} <br>
+            Formato: ${producto.formato}<br>
+            Precio: <b>$${producto.precio}</b><br>
+            <b>Sin Stock</b></p>
+        </div>
+        `;
+        div.innerHTML +=divHTML;
     }
     contenedor.append(div);
 });
 
-const agregarProducto = (id) => {
-    let producto = manga.find((producto) => producto.id === id);
-    let productoEnCarrito = carrito.find(producto => producto.id === id);
-    if (productoEnCarrito){
-        producto.cantidad++;
-    } else {
-        producto.cantidad = 1
-        carrito.push(producto);
+
+//Carrito de compras
+let eliminarProdCarrito = (id) => {
+    carrito[id].cantidad--;
+    if(carrito[id].cantidad === 0){
+        carrito.splice(id, 1);
     }
+    localStorage.setItem("carritoStorage", JSON.stringify(carrito));
     renderizarCarrito();
     calcularTotal();
-} 
+}
+
+let vaciarCarrito = () => {
+    carrito = [];
+    localStorage.setItem("carritoStorage", JSON.stringify(carrito));
+    renderizarCarrito();
+    calcularTotal();
+}
+
+vaciar.addEventListener("click", vaciarCarrito);
 
 let renderizarCarrito = () =>{
     let carritoHTML = "";
@@ -87,9 +117,9 @@ let renderizarCarrito = () =>{
         carritoHTML += `
         <div class="prod-en-carrito">
             <h3>"${prod.titulo}"</h3>
-            <p>Precio: ${prod.precio}<br>
+            <p>Precio: $${prod.precio}<br>
             Cantidad: ${prod.cantidad}<br>
-            <button onclick="eliminarProdCarrito(${id})">Eliminar</button>
+            <button onclick="eliminarProdCarrito(${id})">Eliminar</button><br><br>
         </div>            
         `
     });
@@ -104,25 +134,51 @@ let calcularTotal = () => {
     totalCompra.innerHTML = `<b>$${total}</b>`
 }
 
-let eliminarProdCarrito = (id) => {
-    carrito[id].cantidad--;
-    if(carrito[id].cantidad === 0){
-        carrito.splice(id, 1);
+//Buscar productos cargados anteriormente
+let carritoStorage = JSON.parse(localStorage.getItem("carritoStorage"));
+if(carritoStorage){
+    carrito = carritoStorage;
+}
+renderizarCarrito();
+calcularTotal();
+
+
+//argregar productos al carrito de compras
+const agregarProducto = (id) => {
+    let producto = mangasGuardados.find((producto) => producto.id === id);
+    let productoEnCarrito = carrito.find(producto => producto.id === id);
+    if (productoEnCarrito){
+        if(producto.cantidad < mangasGuardados[id-1].stock){
+            producto.cantidad++;
+        }else{
+            alert(`Su pedido supera la cantidad disponible de Stock del manga: "${producto.titulo}"`)
+        }
+    } else {
+        producto.cantidad = 1
+        carrito.push(producto);
     }
+    localStorage.setItem("carritoStorage", JSON.stringify(carrito));
     renderizarCarrito();
     calcularTotal();
+} 
+
+
+//Realizar la compra(disminuye la cantidad de stock disponible)
+let realizarCompra = () => {
+    for(const prod of carrito){
+        mangasGuardados[prod.id - 1].stock -= prod.cantidad;
+        mangasGuardados[prod.id - 1].cantidad += prod.cantidad;
+    }
+    localStorage.setItem("mangasGuardados", JSON.stringify(mangasGuardados));
+    vaciarCarrito();
+    alert(`Gracias por su compra!`)
 }
 
-let vaciarCarrito = () => {
-    carrito = [];
-    renderizarCarrito();
-    calcularTotal();
-}
+comprar.addEventListener("click", realizarCompra)
 
-vaciar.addEventListener("click", vaciarCarrito);
-
+//Cargar un producto nuevo
 let nuevoManga = () =>{
-    const div = document.createElement(`div`)
+    const div = document.createElement(`div`);
     let cargarHTML = `
     <form id="formulario-carga"><!--marca, formato, titulo, autor, stock, precio-->
         <label for="marca">Marca: </label>
@@ -154,46 +210,96 @@ let nuevoManga = () =>{
 
 agregarNuevoManga.addEventListener("click", nuevoManga);
 
+let agregarAlListado = (id) => {
+    const div = document.createElement(`div`);
+    if (mangasGuardados[id].stock > 0){
+        let divHTML = `
+        <div class="mostrar-productos">
+            <h3 class="titulo-manga">"${mangasGuardados[id].titulo}"</h3>
+            <p>Autor: ${mangasGuardados[id].autor}<br>
+            Editorial: ${mangasGuardados[id].marca} <br>
+            Formato: ${mangasGuardados[id].formato}<br>
+            Precio: <b>$${mangasGuardados[id].precio}</b></p>
+            <button id="agregar-prod", onclick="agregarProducto(${mangasGuardados[id].id})">Agregar al carrito</button>
+        </div>
+        `;
+        div.innerHTML +=divHTML;
+    }else{
+        let divHTML = `
+        <div class="mostrar-productos">
+            <h3 class="titulo-manga">"${mangasGuardados[id].titulo}"</h3>
+            <p>Autor: ${mangasGuardados[id].autor}<br>
+            Editorial: ${mangasGuardados[id].marca} <br>
+            Formato: ${mangasGuardados[id].formato}<br>
+            Precio: <b>$${mangasGuardados[id].precio}</b><br>
+            <b>Sin Stock</b></p>
+        </div>
+        `;
+        div.innerHTML +=divHTML
+    }
+    contenedor.append(div);   
+    localStorage.setItem("mangasGuardados", JSON.stringify(mangasGuardados)); 
+};
+
 formulario.addEventListener("submit", (e) =>{
     e.preventDefault();
-    let numId = manga.length +1;
+    let numId = mangasGuardados.length +1;
     let ingresoMarca = document.getElementById("marca").value;
     let ingresoFormato = document.getElementById("formato").value;
     let ingresoTitulo = document.getElementById("titulo").value;
-    let ingreoAutor = document.getElementById("autor").value;
+    let ingresoAutor = document.getElementById("autor").value;
     let ingresoStock = document.getElementById("stock").value;
-    manga.push(
+    mangasGuardados.push(
         new Manga(
             numId,
             ingresoMarca, 
             ingresoFormato,
             ingresoTitulo,
-            ingreoAutor,
+            ingresoAutor,
             ingresoStock,
             0
         )
     );
 
-    let producto = preciosMarca.find(item => (item.marca === manga[numId-1].marca) && (item.formato === manga[numId-1].formato))
-    manga[numId-1].precio = producto.precio;
+    let producto = preciosMarca.find(item => (item.marca === mangasGuardados[numId-1].marca) && (item.formato === mangasGuardados[numId-1].formato))
+    mangasGuardados[numId-1].precio = producto.precio;
     agregarAlListado(numId-1);
     formulario.innerHTML = ""; 
-} )
+} );
 
-let agregarAlListado = (id) => {
-    const div = document.createElement(`div`);
-    if (manga[id].stock > 0){
-        let divHTML = `
-        <div class="mostrar-productos">
-            <h3 class="titulo-manga">"${manga[id].titulo}"</h3>
-            <p>Autor: ${manga[id].autor}<br>
-            Editorial: ${manga[id].marca} <br>
-            Formato: ${manga[id].formato}<br>
-            Precio: <b>$${manga[id].precio}</b></p>
-            <button id="agregar-prod", onclick="agregarProducto(${manga[id].id})">Agregar al carrito</button>
-        </div>
-        `;
-        div.innerHTML +=divHTML;
-    }
-    contenedor.append(div);    
+
+//ver ventas realizadas
+let cerrarListaVentas = () => {
+    listaVentas.innerHTML = "";
 }
+
+listaVentas.addEventListener("click", cerrarListaVentas);
+
+let verVentas = () => {
+    const table = document.createElement(`table`);
+    let ventasTotales = 0;
+    let recaudadoFinal = 0;
+    let tablaHTML = `<table>
+    <tr>
+    <th>Titulo</th>
+    <th>Cantidad vendida</th>
+    <th>Total recaudado</th>
+    </tr>`
+    for (const producto of mangasGuardados) {
+        if(producto.cantidad>0){
+            let totalRecaudado = producto.precio * producto.cantidad;
+            ventasTotales += producto.cantidad;
+            recaudadoFinal += totalRecaudado;
+            let fila = `<tr><td>${producto.titulo}</td><td>${producto.cantidad}</td><td>$${totalRecaudado}</td></tr>`;
+            tablaHTML += fila;
+        }
+    }
+    tablaHTML += `<tr><td>Total final</td><td>${ventasTotales}</td><td>$${recaudadoFinal}</td></tr>
+    </table>`
+    let botonCerrar = `<button id="cerrar">Cerrar</button>`;
+    tablaHTML += botonCerrar;
+    listaVentas.append(table);
+    listaVentas.innerHTML = tablaHTML;
+}
+
+mangasVendidos.addEventListener("click", verVentas)

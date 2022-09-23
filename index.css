@@ -16,9 +16,11 @@
     height: 50px;
 }
 
-#agregar-manga{
+button{
     margin-left: 50%;
     transform: translateX(-50%);
+    padding: 3px;
+    margin-bottom: 5px;
 }
 
 #pag-principal{
@@ -49,6 +51,10 @@
     box-shadow: 0px 0px 10px rgba(0,0,0,0.6);
 }
 
+.titulo-manga{
+    text-align: center;
+}
+
 .lista{
     padding: 0%;
 }
@@ -62,3 +68,6 @@
     font-style: italic;
 }
 
+#total{
+    float: right;
+}
