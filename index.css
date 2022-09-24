@@ -21,6 +21,7 @@ button{
     transform: translateX(-50%);
     padding: 3px;
     margin-bottom: 5px;
+    margin-top: 5px;
 }
 
 #pag-principal{
@@ -61,7 +62,7 @@ button{
 
 #formulario-carga{
     width: 250px;
-	height: 150px;
+	height: 170px;
     margin: auto;
     padding: 5px;
 	box-shadow: 1px 7px 25px rgba(0,0,0,0.6);
@@ -70,4 +71,25 @@ button{
 
 #total{
     float: right;
+}
+
+.fila{
+    text-align: right;
+}
+
+#tabla{
+    margin-left: 50%;
+    transform: translateX(-50%);
+    padding: 5px;
+	box-shadow: 1px 7px 25px rgba(0,0,0,0.6);
+}
+
+#formulario-carga-stock{
+    width: 380px;
+	height: 60px;
+    margin: auto;
+    padding: 5px;
+	box-shadow: 1px 7px 25px rgba(0,0,0,0.6);
+    font-style: italic;
+}
 }

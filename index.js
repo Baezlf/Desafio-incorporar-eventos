@@ -16,11 +16,11 @@ class Manga {
 }
 
 const manga = [
-    new Manga(1, "Ivrea", "b6 doble", "Shaman king", "Hiroyuki Takei", 30, 1700),
-    new Manga(2, "Ivrea", "tanko", "Chainsaw man", "Tatsuki Fujimoto", 15, 750),
+    new Manga(1, "Ivrea", "b6 doble", "Shaman king", "Hiroyuki Takei", 10, 1700),
+    new Manga(2, "Ivrea", "tanko", "Chainsaw man", "Tatsuki Fujimoto", 10, 750),
     new Manga(3, "Panini", "tanko", "Berserk", "Kentaro Miura", 10, 1100),
-    new Manga(4, "Ivrea", "b6", "Mushihime", "Masaya Hokazono", 15, 850),
-    new Manga(5, "Ivrea", "b6", "Alice in Borderland", "Haro Aso", 14, 1700)
+    new Manga(4, "Ivrea", "b6", "Mushihime", "Masaya Hokazono", 10, 850),
+    new Manga(5, "Ivrea", "b6", "Alice in Borderland", "Haro Aso", 10, 1700)
 ];
 
 class Precios {
@@ -54,8 +54,10 @@ const agregarNuevoManga = document.getElementById("agregar-manga");
 const formulario = document.getElementById("formulario");
 const mangasVendidos = document.getElementById("mangas-vendidos");
 const listaVentas = document.getElementById("ver-ventas");
+const renovarStock = document.getElementById("renovar-stock");
+const cargarStock = document.getElementById("cargar-stock");
 
-//localStorage.setItem("mangasGuardados", JSON.stringify(manga))//comentar despues de cargar un producto nuevo para que no se sobreescriba
+localStorage.setItem("mangasGuardados", JSON.stringify(manga))//comentar despues de cargar un producto nuevo para que no se sobreescriba
 
 
 //mostrar productos en la pagina
@@ -166,8 +168,14 @@ const agregarProducto = (id) => {
 //Realizar la compra(disminuye la cantidad de stock disponible)
 let realizarCompra = () => {
     for(const prod of carrito){
+        console.log(prod);
+        console.log(mangasGuardados[prod.id - 1])
         mangasGuardados[prod.id - 1].stock -= prod.cantidad;
-        mangasGuardados[prod.id - 1].cantidad += prod.cantidad;
+        if (mangasGuardados[prod.id - 1].cantidadVendida){
+            mangasGuardados[prod.id - 1].cantidadVendida += prod.cantidad;
+        } else {
+            mangasGuardados[prod.id - 1].cantidadVendida = prod.cantidad;
+        }
     }
     localStorage.setItem("mangasGuardados", JSON.stringify(mangasGuardados));
     vaciarCarrito();
@@ -248,7 +256,7 @@ formulario.addEventListener("submit", (e) =>{
     let ingresoFormato = document.getElementById("formato").value;
     let ingresoTitulo = document.getElementById("titulo").value;
     let ingresoAutor = document.getElementById("autor").value;
-    let ingresoStock = document.getElementById("stock").value;
+    let ingresoStock = parseInt(document.getElementById("stock").value);
     mangasGuardados.push(
         new Manga(
             numId,
@@ -279,7 +287,7 @@ let verVentas = () => {
     const table = document.createElement(`table`);
     let ventasTotales = 0;
     let recaudadoFinal = 0;
-    let tablaHTML = `<table>
+    let tablaHTML = `<table id="tabla">
     <tr>
     <th>Titulo</th>
     <th>Cantidad vendida</th>
@@ -287,14 +295,14 @@ let verVentas = () => {
     </tr>`
     for (const producto of mangasGuardados) {
         if(producto.cantidad>0){
-            let totalRecaudado = producto.precio * producto.cantidad;
-            ventasTotales += producto.cantidad;
+            let totalRecaudado = producto.precio * producto.cantidadVendida;
+            ventasTotales += producto.cantidadVendida;
             recaudadoFinal += totalRecaudado;
-            let fila = `<tr><td>${producto.titulo}</td><td>${producto.cantidad}</td><td>$${totalRecaudado}</td></tr>`;
+            let fila = `<tr><td>${producto.titulo}</td><td class="fila">${producto.cantidadVendida}</td><td class="fila">$${totalRecaudado}</td></tr>`;
             tablaHTML += fila;
         }
     }
-    tablaHTML += `<tr><td>Total final</td><td>${ventasTotales}</td><td>$${recaudadoFinal}</td></tr>
+    tablaHTML += `<tr><td>Cantidad Total</td><td class="fila">${ventasTotales}</td><td class="fila">$${recaudadoFinal}</td></tr>
     </table>`
     let botonCerrar = `<button id="cerrar">Cerrar</button>`;
     tablaHTML += botonCerrar;
@@ -302,4 +310,37 @@ let verVentas = () => {
     listaVentas.innerHTML = tablaHTML;
 }
 
-mangasVendidos.addEventListener("click", verVentas)
+mangasVendidos.addEventListener("click", verVentas);
+
+//renovar Stock
+cargarStock.addEventListener("submit", (e) =>{
+    e.preventDefault();
+    let stock = parseInt(document.getElementById("stock").value);
+    let titulo = document.getElementById("titulo").value;
+    let index = mangasGuardados.findIndex(item => item.titulo === titulo);
+    console.log(mangasGuardados[index]);
+    
+    mangasGuardados[index].stock += stock;
+    localStorage.setItem("mangasGuardados", JSON.stringify(mangasGuardados)); 
+    cargarStock.innerHTML = "";
+});
+
+let agregarStock = () => {
+    const div = document.createElement(`div`);
+    let stockHTML = `
+    <form id="formulario-carga-stock">
+        <label for="titulo">Titulo: </label>
+        <select id="titulo" name="titulo" required>`;
+        for (const item of mangasGuardados) {
+            let opciones = `<option>${item.titulo}</option>`;            
+            stockHTML += opciones;
+        }
+        stockHTML +=`</select>
+        <input id="stock" name="stock" type="number" min="0" required>
+        <button type="submit">Cargar</button>
+    </form>`;
+    cargarStock.append(div);
+    cargarStock.innerHTML = stockHTML;
+}
+
+renovarStock.addEventListener("click", agregarStock);
